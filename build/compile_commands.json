@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/pi/Downloads/Damiao-Motor/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/home/pi/Downloads/Damiao-Motor/API/include -O0 -Wall -g -ggdb -o CMakeFiles/ReceiveTest.dir/src/ReceiveTest.cpp.o -c /home/pi/Downloads/Damiao-Motor/API/src/ReceiveTest.cpp",
+  "file": "/home/pi/Downloads/Damiao-Motor/API/src/ReceiveTest.cpp"
+},
+{
+  "directory": "/home/pi/Downloads/Damiao-Motor/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/home/pi/Downloads/Damiao-Motor/API/include -O0 -Wall -g -ggdb -o CMakeFiles/ReceiveTest.dir/src/pdtMotor.cpp.o -c /home/pi/Downloads/Damiao-Motor/API/src/pdtMotor.cpp",
+  "file": "/home/pi/Downloads/Damiao-Motor/API/src/pdtMotor.cpp"
+},
+{
+  "directory": "/home/pi/Downloads/Damiao-Motor/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/home/pi/Downloads/Damiao-Motor/API/include -O0 -Wall -g -ggdb -o CMakeFiles/SendTest.dir/src/SendTest.cpp.o -c /home/pi/Downloads/Damiao-Motor/API/src/SendTest.cpp",
+  "file": "/home/pi/Downloads/Damiao-Motor/API/src/SendTest.cpp"
+},
+{
+  "directory": "/home/pi/Downloads/Damiao-Motor/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/home/pi/Downloads/Damiao-Motor/API/include -O0 -Wall -g -ggdb -o CMakeFiles/SendTest.dir/src/pdtMotor.cpp.o -c /home/pi/Downloads/Damiao-Motor/API/src/pdtMotor.cpp",
+  "file": "/home/pi/Downloads/Damiao-Motor/API/src/pdtMotor.cpp"
+}
+]

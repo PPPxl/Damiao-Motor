@@ -4,11 +4,12 @@ project( useEigen )
 set( CMAKE_BUILD_TYPE "Debug" )
 set( CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb" )
 
-include_directories( "/usr/local/include/eigen3" )
+#include_directories( "/usr/local/include/eigen3" )
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-add_executable(test src/test.cpp)
+add_executable(SendTest src/SendTest.cpp src/pdtMotor.cpp)
+add_executable(ReceiveTest src/ReceiveTest.cpp src/pdtMotor.cpp)

@@ -1,0 +1,4 @@
+/home/pi/Downloads/Damiao-Motor/build/CMakeFiles/rebuild_cache.dir
+/home/pi/Downloads/Damiao-Motor/build/CMakeFiles/edit_cache.dir
+/home/pi/Downloads/Damiao-Motor/build/CMakeFiles/ReceiveTest.dir
+/home/pi/Downloads/Damiao-Motor/build/CMakeFiles/SendTest.dir

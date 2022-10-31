@@ -1,0 +1,1 @@
+/usr/bin/arm-linux-gnueabihf-g++ -O0 -Wall -g -ggdb -rdynamic CMakeFiles/ReceiveTest.dir/src/ReceiveTest.cpp.o CMakeFiles/ReceiveTest.dir/src/pdtMotor.cpp.o -o /home/pi/Downloads/Damiao-Motor/API/bin/ReceiveTest 

@@ -15,8 +15,7 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <linux/can/raw.h>
-#include <unistd.h>
-
+#include <vector>
 using namespace std;
 /**
  * @brief The class to remote a single motor or all motors.
@@ -38,8 +37,9 @@ public:
     int float_to_uint(float x, float x_min, float x_max, int bits);
     void ctrl_motor(can_frame frame, uint16_t id, float _pos, float _vel, float _KP, float _KD, float _torq);
     void ctrl_motor2(can_frame frame, uint16_t id, float _pos, float _vel);
-    void ctrl_motor3(can_frame frame, uint16_t id, float _pos, float _vel);
-    void HAL_CAN_RxCpltCallback(can_frame _frame);
+    void ctrl_motor3(can_frame frame, uint16_t id, float _vel);
+    void CAN_Receive();
+    void Raspberry_CAN_RxCpltCallback(can_frame _frame);
 };
 
 /*typedef struct CAN_Handle
