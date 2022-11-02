@@ -42,6 +42,7 @@ public:
     float uint_to_float(int x_int, float x_min, float x_max, int bits);
     int float_to_uint(float x, float x_min, float x_max, int bits);
     void ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float _KD, float _torq);
+    void ctrl_motor1(vector<uint16_t>ids, vector<float>_pos, vector<float>_vel, vector<float>_KP, vector<float>_KD, vector<float>_torq);
     void ctrl_motor2(uint16_t id, float _pos, float _vel);
     void ctrl_motor3(uint16_t id, float _vel);
     void CAN_Receive();

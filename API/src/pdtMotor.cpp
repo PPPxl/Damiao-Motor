@@ -35,7 +35,7 @@ pdtMotor::pdtMotor(char *port, vector<int> ids)
     char port2[255] =" type can bitrate 1000000";
     char port3[255] ="sudo ifconfig ";
     char port4[255] =" up";
-    strcat(port1,port);   //字符串的拼接：port加到port1上
+    strcat(port1,port);      //字符串拼接函数strcat：port加到port1上
     strcat(port1,port2);
     strcat(port3,port);
     strcat(port3,port4);
@@ -86,6 +86,7 @@ pdtMotor::~pdtMotor()
 }
 
 
+
 /**
  * @brief   uint to float
  * 
@@ -101,6 +102,7 @@ float pdtMotor::uint_to_float(int x_int, float x_min, float x_max, int bits)
     float offset = x_min;
     return ((float)x_int)*span/((float)((1<<bits)-1)) + offset;
 }
+
 
 
 
@@ -135,7 +137,17 @@ int pdtMotor::float_to_uint(float x, float x_min, float x_max, int bits)
  */
 void pdtMotor::ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float _KD, float _torq)
 {
-    int P_MIN, P_MAX, V_MIN, V_MAX, KP_MIN, KP_MAX, KD_MIN, KD_MAX, T_MIN, T_MAX;
+    float P_MIN, P_MAX, V_MIN, V_MAX, KP_MIN, KP_MAX, KD_MIN, KD_MAX, T_MIN, T_MAX;
+    P_MIN = -12.5;
+    P_MAX = 12.5;
+    V_MIN = -30;
+    V_MAX = 30;
+    KP_MIN = 0;
+    KP_MAX = 500;
+    KD_MIN = 0;
+    KD_MAX = 5;
+    T_MIN = -18;
+    T_MAX = 18;
     uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
     pos_tmp = float_to_uint(_pos, P_MIN, P_MAX, 16);
     vel_tmp = float_to_uint(_vel, V_MIN, V_MAX, 12);
@@ -171,6 +183,54 @@ void pdtMotor::ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float 
     }
 }
 
+/*
+void pdtMotor::ctrl_motor1(vector<uint16_t>ids, vector<float>_pos, vector<float>_vel, vector<float>_KP, vector<float>_KD, vector<float>_torq)
+{
+    float P_MIN, P_MAX, V_MIN, V_MAX, KP_MIN, KP_MAX, KD_MIN, KD_MAX, T_MIN, T_MAX;
+    P_MIN = -12.5;
+    P_MAX = 12.5;
+    V_MIN = -30;
+    V_MAX = 30;
+    KP_MIN = 0;
+    KP_MAX = 500;
+    KD_MIN = 0;
+    KD_MAX = 5;
+    T_MIN = -18;
+    T_MAX = 18;
+    uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
+    pos_tmp = float_to_uint(_pos, P_MIN, P_MAX, 16);
+    vel_tmp = float_to_uint(_vel, V_MIN, V_MAX, 12);
+    kp_tmp = float_to_uint(_KP, KP_MIN, KP_MAX, 12);
+    kd_tmp = float_to_uint(_KD, KD_MIN, KD_MAX, 12);
+    tor_tmp = float_to_uint(_torq, T_MIN, T_MAX, 12);
+    struct can_frame frame;
+    memset(&frame, 0, sizeof(struct can_frame));
+    //4.Disable filtering rules, do not receive packets, only send
+    setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
+    //5.Set send data
+    frame.can_id = CAN_RTR_FLAG | id ;
+    frame.can_dlc = 0x08;
+    frame.data[0] = (pos_tmp >> 8);
+    frame.data[1] = pos_tmp;
+    frame.data[2] = (vel_tmp >> 4);
+    frame.data[3] = ((vel_tmp&0xF)<<4)|(kp_tmp>> 8);
+    frame.data[4] = kp_tmp;
+    frame.data[5] = (kd_tmp >> 4);
+    frame.data[6] = ((kd_tmp&0xF)<<4)|(tor_tmp>> 8);
+    frame.data[7] = tor_tmp;
+
+    printf("can_id  = 0x%X\r\n", frame.can_id);
+    printf("can_dlc = %d\r\n", frame.can_dlc);
+    int i = 0;
+    for(i = 0; i < 8; i++)
+        printf("data[%d] = %d\r\n", i, frame.data[i]);
+   //6.send message
+    nbytes = write(s, &frame, sizeof(frame)); 
+    if(nbytes != sizeof(frame)) {
+        printf("Send Error frame[0]!\r\n");
+        system("sudo ifconfig can0 down");
+    }
+}*/
 
 
 /**
@@ -253,6 +313,12 @@ void pdtMotor::ctrl_motor3(uint16_t id, float _vel)
     }
 }
 
+
+/**
+ * @brief 电机使能
+ * 
+ * @param id 
+ */
 void pdtMotor::enable(uint16_t id)
 {
     struct can_frame frame;
@@ -277,6 +343,12 @@ void pdtMotor::enable(uint16_t id)
     }
 }
 
+
+/**
+ * @brief 电机失能
+ * 
+ * @param id 
+ */
 void pdtMotor::disable(uint16_t id)
 {
     struct can_frame frame;
@@ -326,7 +398,7 @@ void pdtMotor::Raspberry_CAN_RxCpltCallback(can_frame _frame)
 
 
 /**
- * @brief 
+ * @brief  CAN接收函数
  * 
  */
 void pdtMotor::CAN_Receive()
