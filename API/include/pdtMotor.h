@@ -16,7 +16,7 @@
 #include <sys/ioctl.h>
 #include <linux/can/raw.h>
 #include <vector>
-
+#include <fstream>
 
 
 using namespace std;
@@ -25,40 +25,41 @@ using namespace std;
  * 
  */
 class pdtMotor
-{
-private:
-    int ret;
-    int s, nbytes;
-    struct sockaddr_can addr;
-    struct ifreq ifr;
-    struct can_frame recvFrame;
+{ 
     
 public:
     pdtMotor(char *port, vector<int> ids);
     ~pdtMotor();
     float uint_to_float(int x_int, float x_min, float x_max, int bits);
     int float_to_uint(float x, float x_min, float x_max, int bits);
-    void ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float _KD, float _torq);
-    //void ctrl_motor1(vector<uint16_t>ids, vector<float>_pos, vector<float>_vel, vector<float>_KP, vector<float>_KD, vector<float>_torq);
-    void ctrl_motor2(uint16_t id, float _pos, float _vel);
-    void ctrl_motor3(uint16_t id, float _vel);
-    void CAN_Receive();
-    //void Raspberry_CAN_RxCpltCallback(can_frame _frame);
-    void enable(uint16_t id);
-    void disable(uint16_t id);
+    void MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, float _torq);
+    void pos_ctrl_motor(uint16_t id, float _pos, float _vel);
+    void vel_ctrl_motor(uint16_t id, float _vel);
+    int motor_state_receive();
+    void enable();
+    void disable();
+
+    float P_MIN = -12.5;
+    float P_MAX = 12.5;
+    float V_MIN = -30.0;
+    float V_MAX = 30.0;
+    float KP_MIN = 0.0;
+    float KP_MAX = 500.0;
+    float KD_MIN = 0.0;
+    float KD_MAX = 5.0;
+    float T_MIN = -18.0;
+    float T_MAX = 18.0;
+    int ret;
+    int s, nbytes;
+    struct sockaddr_can addr;
+    struct ifreq ifr;
+    struct can_frame recvFrame;
+    vector<int> ID;
+    int MOTORNUM;
+    vector<float> _pos, _vel, _KP, _KD, _torq;
+    vector<float> present_position, present_velocity, present_torque;
+
+
 };
 
-/*typedef struct CAN_Handle
-{
-    struct pTxMsg;
-}*CAN_HandleTypeDef;*/
-
-/*struct pTxMsg
-{
-    string StdId;
-    string IDE;
-    string RTR;
-    int DLC;
-    double[] data = new double[10];
-};*/
 

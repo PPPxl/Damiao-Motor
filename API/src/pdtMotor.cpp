@@ -23,14 +23,21 @@ using namespace std;
 
 
 /**
- * @brief Construct a new pdt Motor::pdt Motor object
+ * @brief 构造函数及初始化
  * 
  * @param port   the CAN port you need to use
  * @param ids   all IDs of the motors needed controlled
  */
-pdtMotor::pdtMotor(char *port, vector<int> ids)
+pdtMotor::pdtMotor(char *port, vector<int>ids)
 {
-    
+    for(int i=0; i<ids.size(); i++)
+    {
+        ID.push_back(ids[i]);             //向vector尾部添加用push_back     
+        present_position.push_back(0.0);
+        present_velocity.push_back(0.0);
+        present_torque.push_back(0.0);
+    }
+    MOTORNUM = ID.size();
     char port1[255] ="sudo ip link set ";
     char port2[255] =" type can bitrate 1000000";
     char port3[255] ="sudo ifconfig ";
@@ -39,7 +46,7 @@ pdtMotor::pdtMotor(char *port, vector<int> ids)
     strcat(port1,port2);
     strcat(port3,port);
     strcat(port3,port4);
-    //system("sudo ip link set can0 type can bitrate 1000000");  ／／设置can0波特率
+    //system("sudo ip link set can0 type can bitrate 1000000");  //设置can0波特率
     //system("sudo ifconfig can0 up");   //设置can0使能
     //printf("%s", port1);
     //printf("%s", port3);
@@ -89,7 +96,7 @@ pdtMotor::~pdtMotor()
 
 
 /**
- * @brief   uint to float
+ * @brief   uint转float
  * 
  * @param x_int 
  * @param x_min 
@@ -108,7 +115,7 @@ float pdtMotor::uint_to_float(int x_int, float x_min, float x_max, int bits)
 
 
 /**
- * @brief    float to uint
+ * @brief    float转uint
  * 
  * @param x 
  * @param x_min 
@@ -136,19 +143,8 @@ int pdtMotor::float_to_uint(float x, float x_min, float x_max, int bits)
  * @param _KD 
  * @param _torq 
  */
-void pdtMotor::ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float _KD, float _torq)
+void pdtMotor::MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, float _torq)
 {
-    float P_MIN, P_MAX, V_MIN, V_MAX, KP_MIN, KP_MAX, KD_MIN, KD_MAX, T_MIN, T_MAX;
-    P_MIN = -12.5;
-    P_MAX = 12.5;
-    V_MIN = -30;
-    V_MAX = 30;
-    KP_MIN = 0;
-    KP_MAX = 500;
-    KD_MIN = 0;
-    KD_MAX = 5;
-    T_MIN = -18;
-    T_MAX = 18;
     uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
     pos_tmp = float_to_uint(_pos, P_MIN, P_MAX, 16);
     vel_tmp = float_to_uint(_vel, V_MIN, V_MAX, 12);
@@ -156,11 +152,13 @@ void pdtMotor::ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float 
     kd_tmp = float_to_uint(_KD, KD_MIN, KD_MAX, 12);
     tor_tmp = float_to_uint(_torq, T_MIN, T_MAX, 12);
     struct can_frame frame;
-    memset(&frame, 0, sizeof(struct can_frame));
+    memset(&frame, 0, sizeof(struct can_frame));            //memset函数初始化
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
     //5.Set send data
-    frame.can_id = id ;
+    for(int i=0; i<MOTORNUM; i++)
+    {
+    frame.can_id = ID[i];
     frame.can_dlc = 0x08;
     frame.data[0] = (pos_tmp >> 8);
     frame.data[1] = pos_tmp;
@@ -178,10 +176,13 @@ void pdtMotor::ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float 
         //printf("data[%d] = %d\r\n", i, frame.data[i]);
    //6.send message
     nbytes = write(s, &frame, sizeof(frame)); 
-    if(nbytes != sizeof(frame)) {
-        printf("Send Error frame[0]!\r\n");
-        system("sudo ifconfig can0 down");
+    if(nbytes != sizeof(frame)) 
+        {
+            printf("Send Error ID %d!\r\n", ID[i]);
+            system("sudo ifconfig can0 down");
+        }
     }
+   
 }
 
 
@@ -194,7 +195,7 @@ void pdtMotor::ctrl_motor(uint16_t id, float _pos, float _vel, float _KP, float 
  * @param _pos 
  * @param _vel 
  */
-void pdtMotor::ctrl_motor2(uint16_t id, float _pos, float _vel)
+void pdtMotor::pos_ctrl_motor(uint16_t id, float _pos, float _vel)
 {
     uint8_t *pbuf,*vbuf;
     pbuf =(uint8_t*)&_pos;
@@ -237,7 +238,7 @@ void pdtMotor::ctrl_motor2(uint16_t id, float _pos, float _vel)
  * @param id 
  * @param _vel 
  */
-void pdtMotor::ctrl_motor3(uint16_t id, float _vel)
+void pdtMotor::vel_ctrl_motor(uint16_t id, float _vel)
 {
     uint8_t *vbuf;
     struct can_frame frame;
@@ -268,23 +269,25 @@ void pdtMotor::ctrl_motor3(uint16_t id, float _vel)
 
 
 /**
- * @brief 电机使能
+ * @brief Motor enable
  * 
  * @param id 
  */
-void pdtMotor::enable(uint16_t id)
+void pdtMotor::enable()
 {
     struct can_frame frame;
     memset(&frame, 0, sizeof(struct can_frame));
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
     //5.Set send data
-    frame.can_id =  id ;
-    frame.can_dlc = 0x08;
-    for(int i=0; i<7; i++)
-    frame.data[i] = 0xff;
-    frame.data[7] = 0xfc;
-
+    for(int i=0; i<MOTORNUM; i++)
+    {
+        frame.can_id =ID[i];
+        frame.can_dlc = 0x08;
+        for(int g=0; g<7; g++)
+            frame.data[i] = 0xff;
+            frame.data[7] = 0xfc;
+    }
     //printf("can_id  = 0x%X\r\n", frame.can_id);
     //printf("can_dlc = %d\r\n", frame.can_dlc);
 
@@ -298,23 +301,24 @@ void pdtMotor::enable(uint16_t id)
 
 
 /**
- * @brief 电机失能
+ * @brief Motor disable
  * 
- * @param id 
  */
-void pdtMotor::disable(uint16_t id)
+void pdtMotor::disable()
 {
     struct can_frame frame;
     memset(&frame, 0, sizeof(struct can_frame));
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
     //5.Set send data
-    frame.can_id = id ;
-    frame.can_dlc = 0x08;
-    for(int i=0; i<7; i++)
-    frame.data[i] = 0xff;
-    frame.data[7] = 0xfd;
-
+    for(int i=0; i<MOTORNUM; i++)
+    {  
+        frame.can_id = ID[i];
+        frame.can_dlc = 0x08;
+        for(int g=0; g<7; g++)
+            frame.data[i] = 0xff;
+            frame.data[7] = 0xfd;        
+    }
     //printf("can_id  = 0x%X\r\n", frame.can_id);
     //printf("can_dlc = %d\r\n", frame.can_dlc);
 
@@ -326,69 +330,49 @@ void pdtMotor::disable(uint16_t id)
     }
 }
 
-// /**
-//  * @brief  receive and analytic function for the three modes of the motor接收解析函数
-//  * 
-//  * @param _frame 
-//  * @note  
-//  */
-// void pdtMotor::Raspberry_CAN_RxCpltCallback(can_frame _frame)
-// {
-  
-// }
+
 
 
 /**
- * @brief  CAN接收解析函数
+ * @brief CAN接受解析函数
  * 
+ * @return int 
  */
-void pdtMotor::CAN_Receive()
+int pdtMotor::motor_state_receive()
 {
     //4.Define receive rules
     struct can_filter rfilter[1];
     rfilter[0].can_id = 0x00;
     rfilter[0].can_mask = CAN_SFF_MASK;
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
-    //linux下的can通讯，filter方式，不按照id过滤，而是接收所有id发送的数据
+    //linux下的can通讯，filter方式，不按照id过滤，而接收所有id发送的数据
     //5.Receive data and exit
     memset(&recvFrame, 0, sizeof(struct can_frame));
+
     while(1) 
     {
         nbytes = read(s, &recvFrame, sizeof(recvFrame));
         if(nbytes > 0) 
         {
-            // printf("can_id = 0x%X\r\ncan_dlc = %d \r\n", recvFrame.can_id, recvFrame.can_dlc);
-            // int i = 0;
-            // for(i = 0; i < 8; i++)
-            //     printf("data[%d] = %d\r\n", i, recvFrame.data[i]);
-            // break;
-            float p_int, v_int, t_int, P_MIN, P_MAX, V_MIN, V_MAX, T_MIN, T_MAX;
-            P_MIN = -12.5;
-            P_MAX = 12.5;
-            V_MIN = -30;
-            V_MAX = 30;
-            T_MIN = -18;
-            T_MAX = 18;
+            float p_int, v_int, t_int;
             p_int=(recvFrame.data[1]<<8)|recvFrame.data[2];
             v_int=(recvFrame.data[3]<<4)|(recvFrame.data[4]>>4);
             t_int=((recvFrame.data[4]&0xF)<<8)|recvFrame.data[5];
-            float position, velocity, torque;
-            position = uint_to_float(p_int, P_MIN, P_MAX, 16);
-            velocity = uint_to_float(v_int, V_MIN, V_MAX, 12);
-            torque = uint_to_float(t_int, T_MIN, T_MAX, 12);
             
-
-            printf("can_id = 0x%X\r\n", recvFrame.data[0]);
-            printf("position = %f\r\n", position);
-            printf("velocity = %f\r\n", velocity);
-            printf("torque = %f\r\n", torque);  
-                
+            if(recvFrame.data[0]>=1)
+            {
+                present_position[recvFrame.data[0]-1] = uint_to_float(p_int, P_MIN, P_MAX, 16);
+                present_velocity[recvFrame.data[0]-1] = uint_to_float(v_int, V_MIN, V_MAX, 12);
+                present_torque[recvFrame.data[0]-1] = uint_to_float(t_int, T_MIN, T_MAX, 12);
+            }
+            // printf("can_id = 0x%X\r\n", recvFrame.data[0]);
+            // printf("position = %f\r\n", present_position);
+            // printf("velocity = %f\r\n", present_velocity);
+            // printf("torque = %f\r\n", present_torque);  
         break;
-
-        }
-
-            
-        
+        }              
     }
+  return (recvFrame.data[0]);
 }
+
 
