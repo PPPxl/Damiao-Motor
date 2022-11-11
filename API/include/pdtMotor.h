@@ -25,16 +25,15 @@ using namespace std;
  * 
  */
 class pdtMotor
-{ 
-    
+{    
 public:
     pdtMotor(char *port, vector<int> ids);
     ~pdtMotor();
     float uint_to_float(int x_int, float x_min, float x_max, int bits);
     int float_to_uint(float x, float x_min, float x_max, int bits);
-    void MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, float _torq);
-    void pos_ctrl_motor(uint16_t id, float _pos, float _vel);
-    void vel_ctrl_motor(uint16_t id, float _vel);
+    void MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<float> _KP, vector<float> _KD, vector<float> _torq);
+    void pos_ctrl_motor(vector<float> _pos, vector<float> _vel);
+    void vel_ctrl_motor(vector<float> _vel);
     int motor_state_receive();
     void enable();
     void disable();
@@ -56,10 +55,7 @@ public:
     struct can_frame recvFrame;
     vector<int> ID;
     int MOTORNUM;
-    vector<float> _pos, _vel, _KP, _KD, _torq;
     vector<float> present_position, present_velocity, present_torque;
-
-
 };
 
 
