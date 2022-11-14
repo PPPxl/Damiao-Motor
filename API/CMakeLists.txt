@@ -15,3 +15,5 @@ add_executable(SendTest src/SendTest.cpp src/pdtMotor.cpp)
 target_link_libraries(SendTest pthread)   #添加外部链接库pthread
 add_executable(threadTest src/threadTest.cpp src/pdtMotor.cpp)
 target_link_libraries(threadTest pthread)
+add_executable(oneThreadTest src/oneThreadTest.cpp src/pdtMotor.cpp)
+target_link_libraries(oneThreadTest pthread)

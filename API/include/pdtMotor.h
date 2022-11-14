@@ -17,6 +17,7 @@
 #include <linux/can/raw.h>
 #include <vector>
 #include <fstream>
+#include <sys/time.h>
 
 
 using namespace std;
@@ -27,6 +28,27 @@ using namespace std;
 class pdtMotor
 {    
 public:
+    float P_MIN = -12.5;
+    float P_MAX = 12.5;
+    float V_MIN = -30.0;
+    float V_MAX = 30.0;
+    float KP_MIN = 0.0;
+    float KP_MAX = 500.0;
+    float KD_MIN = 0.0;
+    float KD_MAX = 5.0;
+    float T_MIN = -18.0;
+    float T_MAX = 18.0;
+    float sendRate = 3000.0;
+    int ret;
+    int s, nbytes;
+    struct sockaddr_can addr;
+    struct ifreq ifr;
+    struct can_frame recvFrame;
+    vector<int> ID;
+    int MOTORNUM;
+    vector<float> present_position, present_velocity, present_torque;
+
+
     pdtMotor(char *port, vector<int> ids);
     ~pdtMotor();
     float uint_to_float(int x_int, float x_min, float x_max, int bits);
@@ -38,24 +60,6 @@ public:
     void enable();
     void disable();
 
-    float P_MIN = -12.5;
-    float P_MAX = 12.5;
-    float V_MIN = -30.0;
-    float V_MAX = 30.0;
-    float KP_MIN = 0.0;
-    float KP_MAX = 500.0;
-    float KD_MIN = 0.0;
-    float KD_MAX = 5.0;
-    float T_MIN = -18.0;
-    float T_MAX = 18.0;
-    int ret;
-    int s, nbytes;
-    struct sockaddr_can addr;
-    struct ifreq ifr;
-    struct can_frame recvFrame;
-    vector<int> ID;
-    int MOTORNUM;
-    vector<float> present_position, present_velocity, present_torque;
 };
 
 

@@ -9,7 +9,7 @@ using namespace std;
 vector<int> ids ={1,2};
 pdtMotor motorCtl("can1", ids);  
 
-void *ctrlSend(void *data)
+void *ctrlSendandRec(void *data)
 {
   vector<float> target_pos;
   vector<float> target_vel;
@@ -33,13 +33,13 @@ motorCtl.enable();
 motorCtl.MIT_ctrl_motor(target_pos, target_vel, target_KP, target_KD, targrt_tor);
 usleep(1.5e6);
 float k = 0.0;
-ofstream ofs4;           //ofstream输出文件流
-ofs4.open("timeuse1.txt",ios::out);
+//ofstream ofs4;           //ofstream输出文件流
+//ofs4.open("timeuse1.txt",ios::out);
 while(1)
   {
-    struct timeval startTime, endTime1;
-    double timeUse1;
-    gettimeofday(&startTime,NULL);
+    //struct timeval startTime, endTime1;
+    //double timeUse1;
+    //gettimeofday(&startTime,NULL);
     float pos0, vel0;
     k += 1;
     pos0 = sin(k/1000*3.1415926/2);
@@ -57,19 +57,13 @@ while(1)
     target_KD[1] = 0.5;
     targrt_tor[1] = 0.0;
     motorCtl.MIT_ctrl_motor(target_pos, target_vel, target_KP, target_KD, targrt_tor);
-    gettimeofday(&endTime1,NULL);  
-    timeUse1 = 1e6*(endTime1.tv_sec - startTime.tv_sec) + endTime1.tv_usec - startTime.tv_usec; 
+    //gettimeofday(&endTime1,NULL);  
+    //timeUse1 = 1e6*(endTime1.tv_sec - startTime.tv_sec) + endTime1.tv_usec - startTime.tv_usec; 
     //printf("timeUse1 = %f\r\n",timeUse1);
-    ofs4 <<timeUse1<<endl;   
-    //usleep(7e2);
+    //ofs4 <<timeUse1<<endl;   
   }
-  ofs4.close();  
-}
+  //ofs4.close();  
 
-
-
-void *ctrlReceive(void *data)
-{
 ofstream ofs1, ofs2, ofs3;  
 ofs1.open("pos.txt",ios::out);
 ofs2.open("vel.txt",ios::out);
@@ -77,12 +71,9 @@ ofs3.open("tor.txt",ios::out);
 struct timeval startTime,endTime;
 double timeUse;
 gettimeofday(&startTime,NULL);
-printf("Initialization...");
 while(1)
 {
-  printf("777...");
   int updatedID = motorCtl.motor_state_receive();
-  printf("888...");
   gettimeofday(&endTime,NULL);  
   timeUse = 1e6*(endTime.tv_sec - startTime.tv_sec) + endTime.tv_usec - startTime.tv_usec;
   ofs1 <<updatedID<<","<<timeUse<<","<<motorCtl.present_position[updatedID-1]<<endl;
@@ -95,26 +86,18 @@ ofs3.close();
 }
 
 
-
 int main( int argc, char** argv )
 {
-pthread_t th1, th2;
+pthread_t th1;
 int ret;
-ret = pthread_create(&th1,NULL,ctrlSend,NULL);
+ret = pthread_create(&th1,NULL,ctrlSendandRec,NULL);
 if(ret != 0)
 {
 	printf("create pthread1 error!\n");
 	exit(1);
 }
-ret = pthread_create(&th2,NULL,ctrlReceive,NULL);
-if(ret != 0)
-{
-		printf("create pthread2 error!\n");
-		exit(1);
-}
 
 pthread_join(th1, NULL);
-pthread_join(th2, NULL);
 while(1);
 
 return 0;
