@@ -285,18 +285,23 @@ void pdtMotor::enable()
         frame.can_id =ID[i];
         frame.can_dlc = 0x08;
         for(int g=0; g<7; g++)
-            frame.data[i] = 0xff;
+        {
+            frame.data[g] = 0xff;
             frame.data[7] = 0xfc;
+        }      
+    //6.send message
+    nbytes = write(s, &frame, sizeof(frame)); 
+    if(nbytes != sizeof(frame)) 
+     {
+        printf("Enable failed!\r\n");
+        system("sudo ifconfig can0 down");
+     }
+     
     }
     //printf("can_id  = 0x%X\r\n", frame.can_id);
     //printf("can_dlc = %d\r\n", frame.can_dlc);
 
-   //6.send message
-    nbytes = write(s, &frame, sizeof(frame)); 
-    if(nbytes != sizeof(frame)) {
-        printf("Enable failed!\r\n");
-        system("sudo ifconfig can0 down");
-    }
+  
 }
 
 
@@ -316,7 +321,7 @@ void pdtMotor::disable()
         frame.can_id = ID[i];
         frame.can_dlc = 0x08;
         for(int g=0; g<7; g++)
-            frame.data[i] = 0xff;
+            frame.data[g] = 0xff;
             frame.data[7] = 0xfd;        
     }
     //printf("can_id  = 0x%X\r\n", frame.can_id);

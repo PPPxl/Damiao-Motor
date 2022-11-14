@@ -1,0 +1,1 @@
+/usr/bin/c++ -O0 -Wall -g -ggdb -rdynamic CMakeFiles/SendTest.dir/src/SendTest.cpp.o CMakeFiles/SendTest.dir/src/pdtMotor.cpp.o -o ../bin/SendTest  -lpthread 
