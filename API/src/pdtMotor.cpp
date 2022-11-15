@@ -89,8 +89,8 @@ pdtMotor::pdtMotor(char *port, vector<int>ids)
 pdtMotor::~pdtMotor()
 {
     close(s);
-    system("sudo ifconfig can0 down");
-    system("sudo ifconfig can1 down");
+    // system("sudo ifconfig can0 down");
+    // system("sudo ifconfig can1 down");
 }
 
 
@@ -143,21 +143,25 @@ int pdtMotor::float_to_uint(float x, float x_min, float x_max, int bits)
  * @param _KD 
  * @param _torq 
  */
-void pdtMotor::MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, float _torq)
+void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<float> _KP, vector<float> _KD, vector<float> _torq)
 {
-    uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
-    pos_tmp = float_to_uint(_pos, P_MIN, P_MAX, 16);
-    vel_tmp = float_to_uint(_vel, V_MIN, V_MAX, 12);
-    kp_tmp = float_to_uint(_KP, KP_MIN, KP_MAX, 12);
-    kd_tmp = float_to_uint(_KD, KD_MIN, KD_MAX, 12);
-    tor_tmp = float_to_uint(_torq, T_MIN, T_MAX, 12);
     struct can_frame frame;
     memset(&frame, 0, sizeof(struct can_frame));            //memset函数初始化
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
-    //5.Set send data
+
+    uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
     for(int i=0; i<MOTORNUM; i++)
     {
+    struct timeval startTime, endTime1;
+    double timeUse1;
+    gettimeofday(&startTime,NULL);
+    pos_tmp = float_to_uint(_pos[i], P_MIN, P_MAX, 16);
+    vel_tmp = float_to_uint(_vel[i], V_MIN, V_MAX, 12);
+    kp_tmp = float_to_uint(_KP[i], KP_MIN, KP_MAX, 12);
+    kd_tmp = float_to_uint(_KD[i], KD_MIN, KD_MAX, 12);
+    tor_tmp = float_to_uint(_torq[i], T_MIN, T_MAX, 12);
+     //5.Set send data
     frame.can_id = ID[i];
     frame.can_dlc = 0x08;
     frame.data[0] = (pos_tmp >> 8);
@@ -168,7 +172,6 @@ void pdtMotor::MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, floa
     frame.data[5] = (kd_tmp >> 4);
     frame.data[6] = ((kd_tmp&0xF)<<4)|(tor_tmp>> 8);
     frame.data[7] = tor_tmp;
-
     //printf("can_id  = 0x%X\r\n", frame.can_id);
     //printf("can_dlc = %d\r\n", frame.can_dlc);
     //int i = 0;
@@ -179,8 +182,14 @@ void pdtMotor::MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, floa
     if(nbytes != sizeof(frame)) 
         {
             printf("Send Error ID %d!\r\n", ID[i]);
-            system("sudo ifconfig can0 down");
+            // system("sudo ifconfig can0 down");
         }
+    gettimeofday(&endTime1,NULL);  
+    timeUse1 = 1e6*(endTime1.tv_sec - startTime.tv_sec) + endTime1.tv_usec - startTime.tv_usec; 
+    // if(1/sendRate*1e6>timeUse1)
+    // usleep(1/sendRate*1e6-timeUse1);
+
+    usleep(4e2);
     }
    
 }
@@ -195,17 +204,20 @@ void pdtMotor::MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, floa
  * @param _pos 
  * @param _vel 
  */
-void pdtMotor::pos_ctrl_motor(uint16_t id, float _pos, float _vel)
+void pdtMotor::pos_ctrl_motor(vector<float> _pos, vector<float> _vel)
 {
-    uint8_t *pbuf,*vbuf;
-    pbuf =(uint8_t*)&_pos;
-    vbuf =(uint8_t*)&_vel;
     struct can_frame frame;
     memset(&frame, 0, sizeof(struct can_frame));
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
+
+    uint8_t *pbuf,*vbuf;  
+    for(int i=0; i<MOTORNUM; i++)
+    {
+    pbuf =(uint8_t*)&_pos[i];
+    vbuf =(uint8_t*)&_vel[i];
     //5.Set send data
-    frame.can_id =  id;
+    frame.can_id = ID[i];
     frame.can_dlc = 0x08;
     frame.data[0] = *pbuf;
     frame.data[1] = *(pbuf+1);
@@ -215,18 +227,19 @@ void pdtMotor::pos_ctrl_motor(uint16_t id, float _pos, float _vel)
     frame.data[5] = *(vbuf+1);
     frame.data[6] = *(vbuf+2);
     frame.data[7] = *(vbuf+3);
-
-    printf("can_id  = 0x%X\r\n", frame.can_id);
-    printf("can_dlc = %d\r\n", frame.can_dlc);
-    int i = 0;
-    for(i = 0; i < 8; i++)
-        printf("data[%d] = %d\r\n", i, frame.data[i]);
+    //printf("can_id  = 0x%X\r\n", frame.can_id);
+    //printf("can_dlc = %d\r\n", frame.can_dlc);
+    //for(int i = 0; i < 8; i++)
+        //printf("data[%d] = %d\r\n", i, frame.data[i]);
    //6.send message
     nbytes = write(s, &frame, sizeof(frame)); 
-    if(nbytes != sizeof(frame)) {
-        printf("Send Error frame[0]!\r\n");
-        system("sudo ifconfig can0 down");
+    if(nbytes != sizeof(frame)) 
+       {
+         printf("Send Error frame[0]!\r\n");
+        //  system("sudo ifconfig can0 down");
+       }
     }
+    
 }
 
 
@@ -238,33 +251,38 @@ void pdtMotor::pos_ctrl_motor(uint16_t id, float _pos, float _vel)
  * @param id 
  * @param _vel 
  */
-void pdtMotor::vel_ctrl_motor(uint16_t id, float _vel)
+void pdtMotor::vel_ctrl_motor(vector<float> _vel)
 {
-    uint8_t *vbuf;
+    
     struct can_frame frame;
     memset(&frame, 0, sizeof(struct can_frame));
-    vbuf=(uint8_t*)&_vel;
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
+
+    uint8_t *vbuf;
+    for(int i=0; i<MOTORNUM; i++)
+    {
+    vbuf =(uint8_t*)&_vel[i];
     //5.Set send data
-    frame.can_id =  id;
+    frame.can_id = ID[i];
     frame.can_dlc = 0x04;
     frame.data[0] = *vbuf;
     frame.data[1] = *(vbuf+1);
     frame.data[2] = *(vbuf+2);
     frame.data[3] = *(vbuf+3);
-
-    printf("can_id  = 0x%X\r\n", frame.can_id);
-    printf("can_dlc = %d\r\n", frame.can_dlc);
-    int i = 0;
-    for(i = 0; i < 8; i++)
-        printf("data[%d] = %d\r\n", i, frame.data[i]);
+    //printf("can_id  = 0x%X\r\n", frame.can_id);
+    //printf("can_dlc = %d\r\n", frame.can_dlc);
+    //for(int i = 0; i < 8; i++)
+        //printf("data[%d] = %d\r\n", i, frame.data[i]);
    //6.send message
     nbytes = write(s, &frame, sizeof(frame)); 
-    if(nbytes != sizeof(frame)) {
-        printf("Send Error frame[0]!\r\n");
-        system("sudo ifconfig can0 down");
+    if(nbytes != sizeof(frame)) 
+        {
+            printf("Send Error frame[0]!\r\n");
+            // system("sudo ifconfig can0 down");
+        }  
     }
+    
 }
 
 
@@ -287,21 +305,19 @@ void pdtMotor::enable()
         for(int g=0; g<7; g++)
         {
             frame.data[g] = 0xff;
-            frame.data[7] = 0xfc;
-        }      
-    //6.send message
-    nbytes = write(s, &frame, sizeof(frame)); 
-    if(nbytes != sizeof(frame)) 
-     {
+            frame.data[7] = 0xfc;   
+        }
+      nbytes = write(s, &frame, sizeof(frame)); 
+    if(nbytes != sizeof(frame)) {
         printf("Enable failed!\r\n");
-        system("sudo ifconfig can0 down");
-     }
-     
+        // system("sudo ifconfig can1 down");
+    }      
     }
     //printf("can_id  = 0x%X\r\n", frame.can_id);
     //printf("can_dlc = %d\r\n", frame.can_dlc);
 
-  
+   //6.send message
+    
 }
 
 
@@ -321,8 +337,11 @@ void pdtMotor::disable()
         frame.can_id = ID[i];
         frame.can_dlc = 0x08;
         for(int g=0; g<7; g++)
+        {
             frame.data[g] = 0xff;
-            frame.data[7] = 0xfd;        
+            frame.data[7] = 0xfd;
+        }
+                    
     }
     //printf("can_id  = 0x%X\r\n", frame.can_id);
     //printf("can_dlc = %d\r\n", frame.can_dlc);
@@ -331,7 +350,7 @@ void pdtMotor::disable()
     nbytes = write(s, &frame, sizeof(frame)); 
     if(nbytes != sizeof(frame)) {
         printf("Disable failed!\r\n");
-        system("sudo ifconfig can0 down");
+        // system("sudo ifconfig can0 down");
     }
 }
 
@@ -347,10 +366,10 @@ int pdtMotor::motor_state_receive()
 {
     //4.Define receive rules
     struct can_filter rfilter[1];
-    rfilter[0].can_id = 0x00;
+    rfilter[0].can_id = 0x00;      //0x00 is the master ID for receive the feedback value
     rfilter[0].can_mask = CAN_SFF_MASK;
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
-    //linux下的can通讯，filter方式，不按照id过滤，而接收所有id发送的数据
+    //linux下的can通讯，filter方式，不按照id过滤，接收所有id发送的数据
     //5.Receive data and exit
     memset(&recvFrame, 0, sizeof(struct can_frame));
 
@@ -360,9 +379,9 @@ int pdtMotor::motor_state_receive()
         if(nbytes > 0) 
         {
             float p_int, v_int, t_int;
-            p_int=(recvFrame.data[1]<<8)|recvFrame.data[2];
-            v_int=(recvFrame.data[3]<<4)|(recvFrame.data[4]>>4);
-            t_int=((recvFrame.data[4]&0xF)<<8)|recvFrame.data[5];
+            p_int = (recvFrame.data[1]<<8)|recvFrame.data[2];
+            v_int = (recvFrame.data[3]<<4)|(recvFrame.data[4]>>4);
+            t_int = ((recvFrame.data[4]&0xF)<<8)|recvFrame.data[5];
             
             if(recvFrame.data[0]>=1)
             {
@@ -375,9 +394,10 @@ int pdtMotor::motor_state_receive()
             // printf("velocity = %f\r\n", present_velocity);
             // printf("torque = %f\r\n", present_torque);  
         break;
-        }              
+        } 
+
     }
-  return (recvFrame.data[0]);
+   return (recvFrame.data[0]);
 }
 
 

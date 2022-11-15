@@ -75,17 +75,6 @@ CMAKE_BINARY_DIR = /home/pi/Downloads/Damiao-Motor/API/build
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -96,6 +85,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -130,44 +130,70 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named SendTest
+# Target rules for targets named oneThreadTest
 
 # Build rule for target.
-SendTest: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 SendTest
-.PHONY : SendTest
+oneThreadTest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 oneThreadTest
+.PHONY : oneThreadTest
 
 # fast build rule for target.
-SendTest/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/build
-.PHONY : SendTest/fast
+oneThreadTest/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/build
+.PHONY : oneThreadTest/fast
 
-src/SendTest.o: src/SendTest.cpp.o
+#=============================================================================
+# Target rules for targets named priThreadTest
 
-.PHONY : src/SendTest.o
+# Build rule for target.
+priThreadTest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 priThreadTest
+.PHONY : priThreadTest
+
+# fast build rule for target.
+priThreadTest/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/build
+.PHONY : priThreadTest/fast
+
+#=============================================================================
+# Target rules for targets named twoThreadTest
+
+# Build rule for target.
+twoThreadTest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 twoThreadTest
+.PHONY : twoThreadTest
+
+# fast build rule for target.
+twoThreadTest/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/build
+.PHONY : twoThreadTest/fast
+
+src/oneThreadTest.o: src/oneThreadTest.cpp.o
+
+.PHONY : src/oneThreadTest.o
 
 # target to build an object file
-src/SendTest.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/src/SendTest.cpp.o
-.PHONY : src/SendTest.cpp.o
+src/oneThreadTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/src/oneThreadTest.cpp.o
+.PHONY : src/oneThreadTest.cpp.o
 
-src/SendTest.i: src/SendTest.cpp.i
+src/oneThreadTest.i: src/oneThreadTest.cpp.i
 
-.PHONY : src/SendTest.i
+.PHONY : src/oneThreadTest.i
 
 # target to preprocess a source file
-src/SendTest.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/src/SendTest.cpp.i
-.PHONY : src/SendTest.cpp.i
+src/oneThreadTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/src/oneThreadTest.cpp.i
+.PHONY : src/oneThreadTest.cpp.i
 
-src/SendTest.s: src/SendTest.cpp.s
+src/oneThreadTest.s: src/oneThreadTest.cpp.s
 
-.PHONY : src/SendTest.s
+.PHONY : src/oneThreadTest.s
 
 # target to generate assembly for a file
-src/SendTest.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/src/SendTest.cpp.s
-.PHONY : src/SendTest.cpp.s
+src/oneThreadTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/src/oneThreadTest.cpp.s
+.PHONY : src/oneThreadTest.cpp.s
 
 src/pdtMotor.o: src/pdtMotor.cpp.o
 
@@ -175,7 +201,9 @@ src/pdtMotor.o: src/pdtMotor.cpp.o
 
 # target to build an object file
 src/pdtMotor.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/src/pdtMotor.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/src/pdtMotor.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/src/pdtMotor.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/src/pdtMotor.cpp.o
 .PHONY : src/pdtMotor.cpp.o
 
 src/pdtMotor.i: src/pdtMotor.cpp.i
@@ -184,7 +212,9 @@ src/pdtMotor.i: src/pdtMotor.cpp.i
 
 # target to preprocess a source file
 src/pdtMotor.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/src/pdtMotor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/src/pdtMotor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/src/pdtMotor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/src/pdtMotor.cpp.i
 .PHONY : src/pdtMotor.cpp.i
 
 src/pdtMotor.s: src/pdtMotor.cpp.s
@@ -193,8 +223,64 @@ src/pdtMotor.s: src/pdtMotor.cpp.s
 
 # target to generate assembly for a file
 src/pdtMotor.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SendTest.dir/build.make CMakeFiles/SendTest.dir/src/pdtMotor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/oneThreadTest.dir/build.make CMakeFiles/oneThreadTest.dir/src/pdtMotor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/src/pdtMotor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/src/pdtMotor.cpp.s
 .PHONY : src/pdtMotor.cpp.s
+
+src/priThreadTest.o: src/priThreadTest.cpp.o
+
+.PHONY : src/priThreadTest.o
+
+# target to build an object file
+src/priThreadTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/src/priThreadTest.cpp.o
+.PHONY : src/priThreadTest.cpp.o
+
+src/priThreadTest.i: src/priThreadTest.cpp.i
+
+.PHONY : src/priThreadTest.i
+
+# target to preprocess a source file
+src/priThreadTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/src/priThreadTest.cpp.i
+.PHONY : src/priThreadTest.cpp.i
+
+src/priThreadTest.s: src/priThreadTest.cpp.s
+
+.PHONY : src/priThreadTest.s
+
+# target to generate assembly for a file
+src/priThreadTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/priThreadTest.dir/build.make CMakeFiles/priThreadTest.dir/src/priThreadTest.cpp.s
+.PHONY : src/priThreadTest.cpp.s
+
+src/twoThreadTest.o: src/twoThreadTest.cpp.o
+
+.PHONY : src/twoThreadTest.o
+
+# target to build an object file
+src/twoThreadTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/src/twoThreadTest.cpp.o
+.PHONY : src/twoThreadTest.cpp.o
+
+src/twoThreadTest.i: src/twoThreadTest.cpp.i
+
+.PHONY : src/twoThreadTest.i
+
+# target to preprocess a source file
+src/twoThreadTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/src/twoThreadTest.cpp.i
+.PHONY : src/twoThreadTest.cpp.i
+
+src/twoThreadTest.s: src/twoThreadTest.cpp.s
+
+.PHONY : src/twoThreadTest.s
+
+# target to generate assembly for a file
+src/twoThreadTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/twoThreadTest.dir/build.make CMakeFiles/twoThreadTest.dir/src/twoThreadTest.cpp.s
+.PHONY : src/twoThreadTest.cpp.s
 
 # Help Target
 help:
@@ -204,13 +290,21 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... SendTest"
-	@echo "... src/SendTest.o"
-	@echo "... src/SendTest.i"
-	@echo "... src/SendTest.s"
+	@echo "... oneThreadTest"
+	@echo "... priThreadTest"
+	@echo "... twoThreadTest"
+	@echo "... src/oneThreadTest.o"
+	@echo "... src/oneThreadTest.i"
+	@echo "... src/oneThreadTest.s"
 	@echo "... src/pdtMotor.o"
 	@echo "... src/pdtMotor.i"
 	@echo "... src/pdtMotor.s"
+	@echo "... src/priThreadTest.o"
+	@echo "... src/priThreadTest.i"
+	@echo "... src/priThreadTest.s"
+	@echo "... src/twoThreadTest.o"
+	@echo "... src/twoThreadTest.i"
+	@echo "... src/twoThreadTest.s"
 .PHONY : help
 
 

@@ -45,5 +45,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/SendTest.dir/DependInfo.cmake"
+  "CMakeFiles/oneThreadTest.dir/DependInfo.cmake"
+  "CMakeFiles/priThreadTest.dir/DependInfo.cmake"
+  "CMakeFiles/twoThreadTest.dir/DependInfo.cmake"
   )

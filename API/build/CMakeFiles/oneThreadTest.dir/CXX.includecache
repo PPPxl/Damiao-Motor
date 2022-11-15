@@ -28,6 +28,20 @@ fstream
 sys/time.h
 -
 
+/home/pi/Downloads/Damiao-Motor/API/src/oneThreadTest.cpp
+iostream
+-
+pdtMotor.h
+-
+unistd.h
+-
+pthread.h
+-
+sys/time.h
+-
+math.h
+-
+
 /home/pi/Downloads/Damiao-Motor/API/src/pdtMotor.cpp
 stdio.h
 -

@@ -17,6 +17,7 @@
 #include <linux/can/raw.h>
 #include <vector>
 #include <fstream>
+#include <sys/time.h>
 
 
 using namespace std;
@@ -25,20 +26,8 @@ using namespace std;
  * 
  */
 class pdtMotor
-{ 
-    
+{    
 public:
-    pdtMotor(char *port, vector<int> ids);
-    ~pdtMotor();
-    float uint_to_float(int x_int, float x_min, float x_max, int bits);
-    int float_to_uint(float x, float x_min, float x_max, int bits);
-    void MIT_ctrl_motor(float _pos, float _vel, float _KP, float _KD, float _torq);
-    void pos_ctrl_motor(uint16_t id, float _pos, float _vel);
-    void vel_ctrl_motor(uint16_t id, float _vel);
-    int motor_state_receive();
-    void enable();
-    void disable();
-
     float P_MIN = -12.5;
     float P_MAX = 12.5;
     float V_MIN = -30.0;
@@ -49,6 +38,7 @@ public:
     float KD_MAX = 5.0;
     float T_MIN = -18.0;
     float T_MAX = 18.0;
+    float sendRate = 3000.0;
     int ret;
     int s, nbytes;
     struct sockaddr_can addr;
@@ -56,9 +46,19 @@ public:
     struct can_frame recvFrame;
     vector<int> ID;
     int MOTORNUM;
-    vector<float> _pos, _vel, _KP, _KD, _torq;
     vector<float> present_position, present_velocity, present_torque;
 
+
+    pdtMotor(char *port, vector<int> ids);
+    ~pdtMotor();
+    float uint_to_float(int x_int, float x_min, float x_max, int bits);
+    int float_to_uint(float x, float x_min, float x_max, int bits);
+    void MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<float> _KP, vector<float> _KD, vector<float> _torq);
+    void pos_ctrl_motor(vector<float> _pos, vector<float> _vel);
+    void vel_ctrl_motor(vector<float> _vel);
+    int motor_state_receive();
+    void enable();
+    void disable();
 
 };
 
