@@ -47,7 +47,7 @@ pdtMotor::pdtMotor(char *port, vector<int>ids)
     strcat(port3,port);
     strcat(port3,port4);
     //system("sudo ip link set can0 type can bitrate 1000000");  //设置can0波特率
-    //system("sudo ifconfig can0 up");   //设置can0使能
+    //system("sudo ifconfig can0 up");   //set can0 up
     //printf("%s", port1);
     //printf("%s", port3);
     system(port1);
@@ -146,16 +146,18 @@ int pdtMotor::float_to_uint(float x, float x_min, float x_max, int bits)
 void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<float> _KP, vector<float> _KD, vector<float> _torq)
 {
     struct can_frame frame;
-    memset(&frame, 0, sizeof(struct can_frame));            //memset函数初始化
+    memset(&frame, 0, sizeof(struct can_frame));   //memset函数初始化
     //4.Disable filtering rules, do not receive packets, only send
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
 
     uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
+    ofstream ofs5;           //ofstream输出文件流
+    ofs5.open("timeuse2.txt",ios::out);
     for(int i=0; i<MOTORNUM; i++)
     {
-    struct timeval startTime, endTime1;
-    double timeUse1;
-    gettimeofday(&startTime,NULL);
+    struct timeval startTime2, endTime2;
+    double timeUse2;
+    gettimeofday(&startTime2,NULL);
     pos_tmp = float_to_uint(_pos[i], P_MIN, P_MAX, 16);
     vel_tmp = float_to_uint(_vel[i], V_MIN, V_MAX, 12);
     kp_tmp = float_to_uint(_KP[i], KP_MIN, KP_MAX, 12);
@@ -172,11 +174,6 @@ void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<flo
     frame.data[5] = (kd_tmp >> 4);
     frame.data[6] = ((kd_tmp&0xF)<<4)|(tor_tmp>> 8);
     frame.data[7] = tor_tmp;
-    //printf("can_id  = 0x%X\r\n", frame.can_id);
-    //printf("can_dlc = %d\r\n", frame.can_dlc);
-    //int i = 0;
-    //for(i = 0; i < 8; i++)
-        //printf("data[%d] = %d\r\n", i, frame.data[i]);
    //6.send message
     nbytes = write(s, &frame, sizeof(frame)); 
     if(nbytes != sizeof(frame)) 
@@ -184,14 +181,15 @@ void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<flo
             printf("Send Error ID %d!\r\n", ID[i]);
             // system("sudo ifconfig can0 down");
         }
-    gettimeofday(&endTime1,NULL);  
-    timeUse1 = 1e6*(endTime1.tv_sec - startTime.tv_sec) + endTime1.tv_usec - startTime.tv_usec; 
-    // if(1/sendRate*1e6>timeUse1)
-    // usleep(1/sendRate*1e6-timeUse1);
+    gettimeofday(&endTime2,NULL);  
+    timeUse2 = 1e6*(endTime2.tv_sec - startTime2.tv_sec) + endTime2.tv_usec - startTime2.tv_usec; 
+    ofs5 <<timeUse2<<endl;
+    printf("timeUse2= %f\r\n",timeUse2);
+    if(1/sendRate*1e6>timeUse2)
+    usleep(1/sendRate*1e6-timeUse2);
 
-    usleep(4e2);
     }
-   
+ofs5.close();
 }
 
 

@@ -19,13 +19,13 @@ void *ctrlSend(void *data)
   vector<float> target_KP;
   vector<float> target_KD;
   vector<float> targrt_tor;
-
+  //
   target_pos.push_back(0.0);
   target_vel.push_back(0.0);
   target_KP.push_back(0.5);
   target_KD.push_back(0.01);
   targrt_tor.push_back(0.0);
-
+  //
   target_pos.push_back(0.0);
   target_vel.push_back(0.0);
   target_KP.push_back(0.5);
@@ -62,9 +62,7 @@ while(1)
     motorSend.MIT_ctrl_motor(target_pos, target_vel, target_KP, target_KD, targrt_tor);
     gettimeofday(&endTime1,NULL);  
     timeUse1 = 1e6*(endTime1.tv_sec - startTime.tv_sec) + endTime1.tv_usec - startTime.tv_usec; 
-    //printf("timeUse1 = %f\r\n",timeUse1);
     ofs4 <<timeUse1<<endl;   
-    //usleep(7e2);
   }
   ofs4.close();  
 }

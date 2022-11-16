@@ -35,14 +35,12 @@ void *thread1_Recvfunc(void *data)  //receive data
     printf("Initialization...");
     while(1)
     {
- 
     gettimeofday(&startTime,NULL);
     int updatedID = motorCtl.motor_state_receive();
-
     gettimeofday(&endTime,NULL);  
     timeUse = 1e6*(endTime.tv_sec - startTime.tv_sec) + endTime.tv_usec - startTime.tv_usec;
     //printf("timeUse Recv = %f\r\n",timeUse);
-    // cout<<"timeUse Recv: "<<timeUse<<endl;
+    //cout<<"timeUse Recv: "<<timeUse<<endl;
     ofs1 <<updatedID<<","<<timeUse<<","<<motorCtl.present_position[updatedID-1]<<endl;
     ofs2 <<updatedID<<","<<timeUse<<","<<motorCtl.present_velocity[updatedID-1]<<endl;
     ofs3 <<updatedID<<","<<timeUse<<","<<motorCtl.present_torque[updatedID-1]<<endl;
@@ -107,7 +105,6 @@ void *thread2_Sendfunc(void *data) //send data
         motorCtl.MIT_ctrl_motor(target_pos, target_vel, target_KP, target_KD, targrt_tor);
         gettimeofday(&endTime1,NULL);  
         timeUse1 = 1e6*(endTime1.tv_sec - startTime.tv_sec) + endTime1.tv_usec - startTime.tv_usec; 
-        // printf("timeUse Send = %f\r\n",timeUse1);
         ofs4 <<timeUse1<<endl;   
     }
     ofs4.close();
