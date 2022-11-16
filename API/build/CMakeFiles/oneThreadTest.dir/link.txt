@@ -1,1 +1,0 @@
-/usr/bin/c++ -O0 -Wall -g -ggdb -rdynamic CMakeFiles/oneThreadTest.dir/src/oneThreadTest.cpp.o CMakeFiles/oneThreadTest.dir/src/pdtMotor.cpp.o -o ../bin/oneThreadTest  -lpthread 

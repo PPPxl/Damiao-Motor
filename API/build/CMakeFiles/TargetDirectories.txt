@@ -1,5 +1,0 @@
-/home/pi/Downloads/Damiao-Motor/API/build/CMakeFiles/edit_cache.dir
-/home/pi/Downloads/Damiao-Motor/API/build/CMakeFiles/oneThreadTest.dir
-/home/pi/Downloads/Damiao-Motor/API/build/CMakeFiles/rebuild_cache.dir
-/home/pi/Downloads/Damiao-Motor/API/build/CMakeFiles/priThreadTest.dir
-/home/pi/Downloads/Damiao-Motor/API/build/CMakeFiles/twoThreadTest.dir
