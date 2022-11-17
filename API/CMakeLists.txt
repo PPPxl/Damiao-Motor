@@ -4,7 +4,8 @@ project( useEigen )
 set( CMAKE_BUILD_TYPE "Debug" )
 set( CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb" )
 
-#include_directories( "/usr/local/include/eigen3" )
+include_directories( "/usr/local/include/" )
+link_directories("/usr/local/lib")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
@@ -12,8 +13,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_executable(twoThreadTest src/twoThreadTest.cpp src/pdtMotor.cpp)
-target_link_libraries(twoThreadTest pthread)   #添加外部链接库pthread
+target_link_libraries(twoThreadTest pthread lcm)   #添加外部链接库pthread,lcm
 add_executable(priThreadTest src/priThreadTest.cpp src/pdtMotor.cpp)
-target_link_libraries(priThreadTest pthread)
+target_link_libraries(priThreadTest pthread lcm)
 add_executable(oneThreadTest src/oneThreadTest.cpp src/pdtMotor.cpp)
-target_link_libraries(oneThreadTest pthread)
+target_link_libraries(oneThreadTest pthread lcm)

@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <math.h>
+#include <Eigen/Core>
 using namespace std;
 
 

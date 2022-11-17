@@ -1,0 +1,6 @@
+package robotCommand;
+struct robotCommand
+{
+    double  targetEndPos[12];
+    boolean robotRunEnable;
+}
