@@ -16,11 +16,11 @@ namespace robotState
 class robotState
 {
     public:
-        double     F[12];
+        float      F[12];
 
-        double     endPos[12];
+        float      endPos[12];
 
-        double     endVel[12];
+        float      endVel[12];
 
     public:
         /**
@@ -118,13 +118,13 @@ int robotState::_encodeNoHash(void *buf, int offset, int maxlen) const
 {
     int pos = 0, tlen;
 
-    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->F[0], 12);
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->F[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->endPos[0], 12);
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->endPos[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->endVel[0], 12);
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->endVel[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
@@ -134,13 +134,13 @@ int robotState::_decodeNoHash(const void *buf, int offset, int maxlen)
 {
     int pos = 0, tlen;
 
-    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->F[0], 12);
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->F[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->endPos[0], 12);
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->endPos[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->endVel[0], 12);
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->endVel[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
@@ -149,15 +149,15 @@ int robotState::_decodeNoHash(const void *buf, int offset, int maxlen)
 int robotState::_getEncodedSizeNoHash() const
 {
     int enc_size = 0;
-    enc_size += __double_encoded_array_size(NULL, 12);
-    enc_size += __double_encoded_array_size(NULL, 12);
-    enc_size += __double_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
     return enc_size;
 }
 
 uint64_t robotState::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x4c470c7fa6f1ebdeLL;
+    uint64_t hash = 0x2485bc606ff9cd33LL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

@@ -16,7 +16,15 @@ namespace robotCommand
 class robotCommand
 {
     public:
-        double     targetEndPos[12];
+        float      targetEndPos[12];
+
+        float      targetEndVel[12];
+
+        float      targetEndKP[12];
+
+        float      targetEndKD[12];
+
+        float      targetEndTor[12];
 
         int8_t     robotRunEnable;
 
@@ -116,7 +124,19 @@ int robotCommand::_encodeNoHash(void *buf, int offset, int maxlen) const
 {
     int pos = 0, tlen;
 
-    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->targetEndPos[0], 12);
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->targetEndPos[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->targetEndVel[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->targetEndKP[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->targetEndKD[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->targetEndTor[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
     tlen = __boolean_encode_array(buf, offset + pos, maxlen - pos, &this->robotRunEnable, 1);
@@ -129,7 +149,19 @@ int robotCommand::_decodeNoHash(const void *buf, int offset, int maxlen)
 {
     int pos = 0, tlen;
 
-    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->targetEndPos[0], 12);
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->targetEndPos[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->targetEndVel[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->targetEndKP[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->targetEndKD[0], 12);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->targetEndTor[0], 12);
     if(tlen < 0) return tlen; else pos += tlen;
 
     tlen = __boolean_decode_array(buf, offset + pos, maxlen - pos, &this->robotRunEnable, 1);
@@ -141,14 +173,18 @@ int robotCommand::_decodeNoHash(const void *buf, int offset, int maxlen)
 int robotCommand::_getEncodedSizeNoHash() const
 {
     int enc_size = 0;
-    enc_size += __double_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
+    enc_size += __float_encoded_array_size(NULL, 12);
     enc_size += __boolean_encoded_array_size(NULL, 1);
     return enc_size;
 }
 
 uint64_t robotCommand::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x0010013da86351a5LL;
+    uint64_t hash = 0x6cc96a203ebaa606LL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

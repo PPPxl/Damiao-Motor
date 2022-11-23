@@ -12,9 +12,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-add_executable(twoThreadTest src/twoThreadTest.cpp src/pdtMotor.cpp)
+add_executable(twoThreadTest src/twoThreadTest.cpp src/pdtMotor.cpp src/handler.cpp src/motionCalculate.cpp)
 target_link_libraries(twoThreadTest pthread lcm)   #添加外部链接库pthread,lcm
-add_executable(priThreadTest src/priThreadTest.cpp src/pdtMotor.cpp)
+add_executable(priThreadTest src/priThreadTest.cpp src/pdtMotor.cpp src/handler.cpp src/motionCalculate.cpp)
 target_link_libraries(priThreadTest pthread lcm)
-add_executable(oneThreadTest src/oneThreadTest.cpp src/pdtMotor.cpp)
+add_executable(oneThreadTest src/oneThreadTest.cpp src/pdtMotor.cpp src/handler.cpp src/motionCalculate.cpp)
 target_link_libraries(oneThreadTest pthread lcm)
+add_executable(motionCtl src/motionCtl.cpp src/pdtMotor.cpp src/handler.cpp src/motionCalculate.cpp)
+target_link_libraries(motionCtl pthread lcm)

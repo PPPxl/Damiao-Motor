@@ -1,6 +1,10 @@
 package robotCommand;
 struct robotCommand
 {
-    double  targetEndPos[12];
+    float  targetEndPos[12];
+    float  targetEndVel[12];
+    float  targetEndKP[12];
+    float  targetEndKD[12];
+    float  targetEndTor[12];
     boolean robotRunEnable;
 }

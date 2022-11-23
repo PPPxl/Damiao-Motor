@@ -184,11 +184,11 @@ void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<flo
     gettimeofday(&endTime2,NULL);  
     timeUse2 = 1e6*(endTime2.tv_sec - startTime2.tv_sec) + endTime2.tv_usec - startTime2.tv_usec; 
     ofs5 <<timeUse2<<endl;
-    printf("timeUse2= %f\r\n",timeUse2);
+    //printf("timeUse2= %f\r\n",timeUse2);
     if(1/sendRate*1e6>timeUse2)
     usleep(1/sendRate*1e6-timeUse2);
-
     }
+    
 ofs5.close();
 }
 

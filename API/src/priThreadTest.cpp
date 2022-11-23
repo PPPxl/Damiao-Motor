@@ -9,19 +9,29 @@
 #include <sys/mman.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <lcm/lcm-cpp.hpp>
+#include "robotState/robotState.hpp"
+#include "robotCommand/robotCommand.hpp"
+#include "handler.h"
+
+using namespace std;
 
 #define PRIORITYRECV 20
 #define PRIORITYSEND 50
-#define PRIORITYLCMRECV 10
-#define PRIORITYLCMSEND 30
+#define PRIORITYLCMRECV 30
+#define PRIORITYLCMSEND 10
 #define THREAD1_ENABLE 1
 #define THREAD2_ENABLE 1
-using namespace std;
+#define THREAD3_ENABLE 1
+#define THREAD4_ENABLE 1
 
 
+lcm::LCM Lcm;
+// robotCommand::robotCommand rc;
+// RobotStateHandler rsHandle;
+vector<float> ActPos(12), ActVel(12), ActTor(12);
 
-
-void *thread1_Recvfunc(void *data)  //receive data
+void *thread1_Recvfunc(void *data)  //receive feedback data from motor
 {
     vector<int> ids;
     ids.push_back(1);
@@ -34,7 +44,6 @@ void *thread1_Recvfunc(void *data)  //receive data
     ofs3.open("tor.txt",ios::out);
     struct timeval startTime,endTime;
     double timeUse;
-    printf("Initialization...");
     while(1)
     {
     gettimeofday(&startTime,NULL);
@@ -43,6 +52,9 @@ void *thread1_Recvfunc(void *data)  //receive data
     timeUse = 1e6*(endTime.tv_sec - startTime.tv_sec) + endTime.tv_usec - startTime.tv_usec;
     //printf("timeUse Recv = %f\r\n",timeUse);
     //cout<<"timeUse Recv: "<<timeUse<<endl;
+    ActPos.push_back(motorCtl.present_position[updatedID-1]);
+    ActVel.push_back(motorCtl.present_velocity[updatedID-1]);
+    ActTor.push_back(motorCtl.present_torque[updatedID-1]);
     ofs1 <<updatedID<<","<<timeUse<<","<<motorCtl.present_position[updatedID-1]<<endl;
     ofs2 <<updatedID<<","<<timeUse<<","<<motorCtl.present_velocity[updatedID-1]<<endl;
     ofs3 <<updatedID<<","<<timeUse<<","<<motorCtl.present_torque[updatedID-1]<<endl;
@@ -53,7 +65,31 @@ void *thread1_Recvfunc(void *data)  //receive data
 }
 
 
-void *thread2_Sendfunc(void *data) //send data
+void *thread4_lcmSendData(void *data)  //send feedback data to motion control level
+{
+    robotState::robotState my_robotState;
+    while (1)
+    {
+        for(int i = 0; i < 12; i++)
+        {
+            my_robotState.F[i] = ActTor[i];
+            my_robotState.endPos[i] = ActPos[i];
+            my_robotState.endVel[i] = ActVel[i];
+        }
+        Lcm.publish("ROBOTSTATE",&my_robotState);
+    }
+
+}
+
+
+
+void *thread3_lcmRecvCommand(void *data)  //receive command from motion control level
+{
+    
+}
+
+
+void *thread2_Sendfunc(void *data) //send commend to motor  
 {
     vector<int> ids;
     ids.push_back(1);
@@ -113,16 +149,6 @@ void *thread2_Sendfunc(void *data) //send data
 }
 
 
-void *thread3_lcmRecvCommand(void *data)  //receive motion control command
-{
-    
-}
-
-
-void *thread4_lcmSendData(void *data)  //send robot data
-{
-    
-}
 
 
 void thread_init()
@@ -313,7 +339,6 @@ void thread_init()
 out:
     ret;
 }
-
 
 
 int main( int argc, char** argv )
