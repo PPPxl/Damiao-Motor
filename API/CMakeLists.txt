@@ -20,3 +20,5 @@ add_executable(oneThreadTest src/oneThreadTest.cpp src/pdtMotor.cpp src/handler.
 target_link_libraries(oneThreadTest pthread lcm)
 add_executable(motionCtl src/motionCtl.cpp src/pdtMotor.cpp src/handler.cpp src/motionCalculate.cpp)
 target_link_libraries(motionCtl pthread lcm)
+add_executable(testRecv src/testRecv.cpp)
+target_link_libraries(testRecv pthread lcm)

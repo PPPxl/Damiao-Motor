@@ -4,7 +4,7 @@ void RobotStateHandler::handleMessage(const lcm::ReceiveBuffer* rbuf,
         const std::string& chan, 
         const robotState::robotState* msg)
 {
-    for(int i=0; i<12; i++)
+    for(int i=0; i<2; i++)
     {
         F[i] = msg->F[i];
         endPos[i] = msg->endPos[i];
