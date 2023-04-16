@@ -151,13 +151,13 @@ void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<flo
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
 
     uint16_t pos_tmp, vel_tmp, kp_tmp, kd_tmp, tor_tmp;
-    ofstream ofs5;           //ofstream输出文件流
-    ofs5.open("timeuse2.txt",ios::out);
+    // ofstream ofs5;           //ofstream输出文件流
+    // ofs5.open("timeuse2.txt",ios::out);
     for(int i=0; i<MOTORNUM; i++)
     {
     struct timeval startTime2, endTime2;
     double timeUse2;
-    gettimeofday(&startTime2,NULL);
+    // gettimeofday(&startTime2,NULL);
     pos_tmp = float_to_uint(_pos[i], P_MIN, P_MAX, 16);
     vel_tmp = float_to_uint(_vel[i], V_MIN, V_MAX, 12);
     kp_tmp = float_to_uint(_KP[i], KP_MIN, KP_MAX, 12);
@@ -181,15 +181,15 @@ void pdtMotor::MIT_ctrl_motor(vector<float> _pos, vector<float> _vel, vector<flo
             printf("Send Error ID %d!\r\n", ID[i]);
             // system("sudo ifconfig can0 down");
         }
-    gettimeofday(&endTime2,NULL);  
-    timeUse2 = 1e6*(endTime2.tv_sec - startTime2.tv_sec) + endTime2.tv_usec - startTime2.tv_usec; 
-    ofs5 <<timeUse2<<endl;
-    //printf("timeUse2= %f\r\n",timeUse2);
-    if(1/sendRate*1e6>timeUse2)
-    usleep(1/sendRate*1e6-timeUse2);
+    // gettimeofday(&endTime2,NULL);  
+    // timeUse2 = 1e6*(endTime2.tv_sec - startTime2.tv_sec) + endTime2.tv_usec - startTime2.tv_usec; 
+    // ofs5 <<timeUse2<<endl;
+    // //printf("timeUse2= %f\r\n",timeUse2);
+    // if(1/sendRate*1e6>timeUse2)
+    // usleep(1/sendRate*1e6-timeUse2);
     }
     
-ofs5.close();
+// ofs5.close();
 }
 
 
@@ -366,11 +366,14 @@ int pdtMotor::motor_state_receive()
     struct can_filter rfilter[1];
     rfilter[0].can_id = 0x00;      //0x00 is the master ID for receive the feedback value
     rfilter[0].can_mask = CAN_SFF_MASK;
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 5000;
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
     //linux下的can通讯，filter方式，不按照id过滤，接收所有id发送的数据
+    setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     //5.Receive data and exit
     memset(&recvFrame, 0, sizeof(struct can_frame));
-
     while(1) 
     {
         nbytes = read(s, &recvFrame, sizeof(recvFrame));
@@ -380,7 +383,6 @@ int pdtMotor::motor_state_receive()
             p_int = (recvFrame.data[1]<<8)|recvFrame.data[2];
             v_int = (recvFrame.data[3]<<4)|(recvFrame.data[4]>>4);
             t_int = ((recvFrame.data[4]&0xF)<<8)|recvFrame.data[5];
-            
             if(recvFrame.data[0]>=1)
             {
                 present_position[recvFrame.data[0]-1] = uint_to_float(p_int, P_MIN, P_MAX, 16);
